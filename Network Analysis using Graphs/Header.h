@@ -191,7 +191,7 @@ public:
 		getline(file, buffer);
 		getline(file, buffer);
 		getline(file, buffer);
-		while (counter < 10) {  // initially 10 to test on small dataset.
+		while (counter < 100) {  // initially 10 to test on small dataset.
 			getline(file, buffer);  // reading line.
 			subBuffer = "";  // resetting everything.
 			i = 0;
@@ -224,6 +224,24 @@ public:
 		file.close();
 	}
 	
+	void displayNodes() {
+		listNode* itt = list;
+		while (itt != 0) {
+			cout << itt->address->getID() << endl;
+			itt = itt->next;
+		}
+	}
+	void sourceNodesDetails() {
+		listNode* itt = list;
+		while (itt != 0) {
+			if (itt->address->isSourceNode()) {
+				itt->address->printIn();
+				itt->address->printOut();
+			}
+			itt = itt->next;
+		}
+	}
+
 	// Part 1
 	void numberOfNodes() {
 		int no = 0;
@@ -278,19 +296,44 @@ public:
 	}
 
 	// Part 2
-	void displayInDegree() {
-		listNode* itt = list;
-		for (int i = 0; i < 10; i++) {
-			itt->address->printIn();
-			itt = itt->next;
+	void displayInDegree(int n = -1) {
+		if (n == -1) {
+			listNode* itt = list;
+			while (itt != 0) {
+				itt->address->printIn();
+				itt = itt->next;
+			}
+		}
+		else {
+			listNode* itt = list;
+			while (itt != 0) {
+				if (itt->address->getID() == n) {
+					itt->address->printIn();
+					return;
+				}
+				itt = itt->next;
+			}
 		}
 	}
-	void displayOutDegree() {
-		listNode* itt = list;
-		for (int i = 0; i < 10; i++) {
-			itt->address->printOut();
-			itt = itt->next;
+	void displayOutDegree(int n = -1) {
+		if (n == -1) {
+			listNode* itt = list;
+			while (itt != 0) {
+				itt->address->printOut();
+				itt = itt->next;
+			}
 		}
+		else {
+			listNode* itt = list;
+			while (itt != 0) {
+				if (itt->address->getID() == n) {
+					itt->address->printOut();
+					return;
+				}
+				itt = itt->next;
+			}
+		}
+		
 	}
 
 	// Part 3

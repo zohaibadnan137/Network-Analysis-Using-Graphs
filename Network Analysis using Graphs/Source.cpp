@@ -11,7 +11,7 @@ int main() {
 	G1.numberOfSourceNodes();
 	G1.numberOfSinkNodes();
 	G1.numberOfIsolatedNodes();
-	
+
 	// Part 2
 	G1.displayInDegree();
 	G1.displayOutDegree();
