@@ -4,6 +4,8 @@
 #include<string>
 using namespace std;
 
+
+
 class vertex;
 
 struct adjacencyListNode {
@@ -169,6 +171,9 @@ class graph {
 			return temp;
 		}
 	}
+	bool isolatedNodeCheck(listNode* check) {
+
+	}
 public:
 	// prerequisites
 	graph() {
@@ -293,6 +298,13 @@ public:
 			itt = itt->next;
 		}
 		cout << "Number of Isolated Nodes: " << n << endl;
+	}
+	bool isIsolatedVertex() {
+		listNode* itt = list;
+		while (itt != 0) {
+
+			itt = itt->next;
+		}
 	}
 
 	// Part 2
