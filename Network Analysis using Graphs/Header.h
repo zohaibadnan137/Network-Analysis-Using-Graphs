@@ -4,9 +4,103 @@
 #include<string>
 using namespace std;
 
-
-
 class vertex;
+
+struct QNode {
+	bool visited;
+	vertex* address;
+	QNode* next;
+
+	QNode(vertex* A = 0) {
+		visited = false;
+		address = A;
+		next = 0;
+	}
+	void markVisited() {
+		visited = true;
+	}
+};
+
+struct Queue {
+	QNode* front;
+	QNode* rear;
+
+	Queue() {
+		front = 0;
+		rear = 0;
+	}
+	void enqueue(vertex* A) {
+		if (front == 0) {  // if empty
+			front = rear = new QNode; // create new
+			front->address = A;  // front->address is vertex's address.
+		}
+		else {
+			QNode* temp = new QNode;
+			temp->address = A;
+			rear->next = temp;
+			rear = rear->next;
+		}
+	}
+	vertex* dequeue() {
+		vertex* ret;
+		if (front->next == 0) {
+			ret = front->address;
+			delete front;
+			front = rear = 0;
+		}
+		else {
+			QNode* temp = front;
+			ret = temp->address;
+			front = front->next;
+			delete temp;
+		}
+		return ret;
+	}
+	bool isEmpty() {
+		if (front == rear == 0) {
+			return true;
+		}
+		return false;
+	}
+};
+
+struct visitedListNode {
+	vertex* address;
+	visitedListNode* next;
+
+	visitedListNode(vertex* A = 0) {
+		address = A;
+		next = 0;
+	}
+};
+
+class visitedList {
+	visitedListNode* head;
+	int size;
+
+public:
+	visitedList() {
+		head = 0;
+		size = 0;
+	}
+	void add(vertex* A) {
+		if (head == 0) {
+			head = new visitedListNode;
+			head->address = A;
+			size++;
+		}
+	}
+	bool checkIfVisited(vertex* v) {
+		visitedListNode* itt = head;
+		while (itt != 0) {
+			if (itt->address == v) {
+				return true;
+			}
+			itt = itt->next;
+		}
+		return false;
+	}
+};
 
 struct adjacencyListNode {
 	int from;
@@ -103,6 +197,9 @@ public:
 		}
 		cout << endl << "Out degree: " << n << endl;
 	}
+	listNode* getInNode() {
+		return inNodes;
+	}
 };
 
 class graph {
@@ -171,8 +268,24 @@ class graph {
 			return temp;
 		}
 	}
-	bool isolatedNodeCheck(listNode* check) {
-
+	bool articulationNodeCheck(listNode* check) {
+		// Checking through BFS.
+		Queue q1;
+		visitedList visited;
+		vertex* v;
+		listNode* itt = v->getInNode();
+		visited.add(v);
+		q1.enqueue(list->address);
+		while (!q1.isEmpty()) {
+			v = q1.dequeue();
+			while (itt != 0) {
+				q1.enqueue(itt->address);
+				if (!visited.checkIfVisited(itt->address)) {
+					visited.add(itt->address);
+				}
+				itt = itt->next;
+			}
+		}
 	}
 public:
 	// prerequisites
@@ -196,8 +309,11 @@ public:
 		getline(file, buffer);
 		getline(file, buffer);
 		getline(file, buffer);
-		while (counter < 100) {  // initially 10 to test on small dataset.
+		while (counter < 200) {  // initially 10 to test on small dataset.
 			getline(file, buffer);  // reading line.
+			if (buffer == "") {
+				break;
+			}
 			subBuffer = "";  // resetting everything.
 			i = 0;
 			while (buffer[i] != 9) {  // reading till tab(ascii = 9).
@@ -299,10 +415,10 @@ public:
 		}
 		cout << "Number of Isolated Nodes: " << n << endl;
 	}
-	bool isIsolatedVertex() {
+	bool IsolatedVertex() {
 		listNode* itt = list;
 		while (itt != 0) {
-
+			articulationNodeCheck(itt);
 			itt = itt->next;
 		}
 	}
