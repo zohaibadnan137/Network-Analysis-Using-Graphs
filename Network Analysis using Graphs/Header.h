@@ -214,6 +214,7 @@ class graph {
 			}
 			itt = itt->next;
 		}
+		itt = adjacencyListHead;
 		while (itt != 0) {  // iterating through adjacency list and checking if edge exists.
 			if (toId == itt->from && fromId == itt->to) {
 				return true;
@@ -309,7 +310,7 @@ public:
 		getline(file, buffer);
 		getline(file, buffer);
 		getline(file, buffer);
-		while (counter < 200) {  // initially 10 to test on small dataset.
+		while (true) {  // initially 10 to test on small dataset.
 			getline(file, buffer);  // reading line.
 			if (buffer == "") {
 				break;
