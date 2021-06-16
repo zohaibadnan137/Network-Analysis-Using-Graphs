@@ -341,9 +341,9 @@ class graph {
 		q1.enqueue(v);
 		while (!q1.isEmpty()) {
 			v = q1.dequeue();
+			itt = v->getOutNode();
 			while (itt != 0) {
 				q1.enqueue(itt->address);
-				itt = v->getOutNode();
 				if (itt == 0) {
 					break;
 				}
@@ -355,7 +355,7 @@ class graph {
 		}
 		int temp = visited.getSize();
 		int temp2 = countNodes();
-		if (visited.getSize() != countNodes() - 1) {
+		if (visited.getSize() != (countNodes() - 1)) {
 			return true;
 		}
 		return false;
@@ -384,7 +384,7 @@ public:
 		getline(file, buffer);
 		getline(file, buffer);
 		getline(file, buffer);
-		while (true) {  // initially 10 to test on small dataset.
+		while (counter < 10) {  // initially 10 to test on small dataset.
 			getline(file, buffer);  // reading line.
 			if (buffer == "") {
 				break;
