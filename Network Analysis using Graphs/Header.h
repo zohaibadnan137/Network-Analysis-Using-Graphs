@@ -41,10 +41,12 @@ struct Queue {
 
 	QNode* front;
 	QNode* rear;
+	int size;
 
 	Queue() { 
 		front = 0;
 		rear = 0;
+		size = 0;
 	}
 	void enqueue(vertex* A) {
 		if (front == 0) {  // if empty
@@ -57,13 +59,14 @@ struct Queue {
 			rear->next = temp;
 			rear = rear->next;
 		}
+		size++;
+		return;
 	}
 	vertex* dequeue() {
-		vertex* ret;
+		vertex* ret = 0;
 		if (front == 0) {
 			delete front;
 			front = rear = 0;
-			return 0;
 		}
 		else {
 			QNode* temp = front;
@@ -71,13 +74,18 @@ struct Queue {
 			front = front->next;
 			delete temp;
 		}
+		size--;
 		return ret;
 	}
 	bool isEmpty() {
-		if (front == rear == 0) {
+		if (/*front == rear == 0*/ !size) {
 			return true;
 		}
 		return false;
+	}
+	int getSize()
+	{
+		return size;
 	}
 };
 
@@ -127,6 +135,20 @@ public:
 		}
 		return false;
 	}
+	~visitedList() // Destructor
+	{
+		if (head != 0) // Do nothing if the list is already empty
+		{
+			visitedListNode* itt; // Delete the list starting from the head 
+			while (head != 0)
+			{
+				itt = head; // Store the current node
+				head = head->next; // Move the head to next node
+				delete itt; // Delete the current node
+			}
+			return;
+		}
+	}
 };
 
 struct adjacencyListNode {
@@ -155,7 +177,7 @@ struct listNode {
 class vertex {
 
 	int ID;
-	// Circular linked lists for directionality
+	// Singly linked lists for directionality
 	listNode* inNodes; // These nodes point towards the current node
 	listNode* outNodes; // The current node points towards these nodes
 
@@ -446,7 +468,7 @@ public:
 			no++;
 			itt = itt->next;
 		}
-		cout << no << endl;
+		cout << "Number of nodes: " << no << endl;
 	}
 	void numberOfEdges() {
 		adjacencyListNode* itt = adjacencyListHead;
@@ -495,6 +517,53 @@ public:
 	}
 
 	// Parts 8 and 9
+	void findShortestPath(int srcID, int destID)
+	{
+		listNode* src = IDIsPresent(srcID);
+		listNode* dest = IDIsPresent(destID);
+		if (src == 0)
+		{
+			cout << "Error! The source vertex does not exist." << endl;
+			return;
+		}
+		else if (dest == 0)
+		{
+			cout << "Error! The destination vertex does not exist." << endl;
+			return;
+		}
+		Queue q;
+		visitedList visited;
+		int length = 1;
+		q.enqueue(src->address);
+		visited.add(src->address);
+		while (!q.isEmpty())
+		{
+			int inQueue = q.getSize();
+			while (inQueue > 0)
+			{
+				vertex* temp1 = q.dequeue();
+				//if (temp2->getID() == destID)
+					//goto next;
+				listNode* temp2 = temp1->getOutNode();
+				while (temp2 != 0)
+				{
+					if (temp2->address->getID() == destID)
+						goto next;
+					if (!visited.checkIfVisited(temp2->address))
+					{
+						visited.add(temp2->address);
+						q.enqueue(temp2->address);
+					}
+					temp2 = temp2->next;
+				}
+				inQueue--;
+			}
+			length++;
+		}
+	next:
+		cout << "The shortest path between " << srcID << " and " << destID << " is " << length << "." << endl;
+		return;
+	}
 
 	// Parts 10 and 11
 	void displayInDegree(int n = -1) {
@@ -533,8 +602,7 @@ public:
 				}
 				itt = itt->next;
 			}
-		}
-		
+		}		
 	}
 };
 
