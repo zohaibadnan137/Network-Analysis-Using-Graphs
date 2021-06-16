@@ -2,8 +2,9 @@
 
 int main() {
 	string dataPath = "C:\\Users\\abdul\\source\\repos\\Network Analysis using Graphs\\Network Analysis using Graphs\\Text.txt";
+	//string dataPath = "C:\\Users\\zohai\\Desktop\\CA-GrQc.txt";
 	graph G1;
-	G1.createTree(dataPath);
+	G1.createGraph(dataPath);
 
 	// Part 1
 	G1.numberOfNodes();
@@ -14,5 +15,5 @@ int main() {
 
 	// Part 2
 	//G1.displayInDegree();
-	G1.displayOutDegree();
+	//G1.displayOutDegree();
 }

@@ -1,31 +1,47 @@
+// Abdullah Bilal 19i-0616
+// Zohaib Adnan 19i-0741
+// Data Structures 
+// Project 
+
 #pragma once
 #include<iostream>
 #include<fstream>
 #include<string>
 using namespace std;
 
+//**************** Structure and Class Prototypes ****************//
+
+struct QNode;
+struct Queue;
+struct visitedListNode;
+class visitedList;
+struct adjacencyListNode;
+struct listNode;
 class vertex;
+class graph;
 
-struct QNode {
-	bool visited;
-	vertex* address;
-	QNode* next;
-
-	QNode(vertex* A = 0) {
-		visited = false;
-		address = A;
-		next = 0;
-	}
-	void markVisited() {
-		visited = true;
-	}
-};
+//**************** Structure and Class Definitions ****************//
 
 struct Queue {
+	struct QNode {
+		bool visited;
+		vertex* address;
+		QNode* next;
+
+		QNode(vertex* A = 0) {
+			visited = false;
+			address = A;
+			next = 0;
+		}
+		void markVisited() {
+			visited = true;
+		}
+	};
+
 	QNode* front;
 	QNode* rear;
 
-	Queue() {
+	Queue() { 
 		front = 0;
 		rear = 0;
 	}
@@ -64,17 +80,17 @@ struct Queue {
 	}
 };
 
-struct visitedListNode {
-	vertex* address;
-	visitedListNode* next;
-
-	visitedListNode(vertex* A = 0) {
-		address = A;
-		next = 0;
-	}
-};
-
 class visitedList {
+	struct visitedListNode {
+		vertex* address;
+		visitedListNode* next;
+
+		visitedListNode(vertex* A = 0) {
+			address = A;
+			next = 0;
+		}
+	};
+
 	visitedListNode* head;
 	int size;
 
@@ -128,8 +144,9 @@ struct listNode {
 class vertex {
 
 	int ID;
-	listNode* inNodes;
-	listNode* outNodes;
+	// Circular linked lists for directionality
+	listNode* inNodes; // These nodes point towards the current node
+	listNode* outNodes; // The current node points towards these nodes
 
 public:
 	bool isSourceNode() {
@@ -168,14 +185,14 @@ public:
 			outNodes = temp;
 		}
 	}
-	vertex(int id):ID(id) {
+	vertex(int id):ID(id) { // Constructor 
 		inNodes = 0;
 		outNodes = 0;
 	}
 	int getID() {
 		return ID;
 	}
-	void printIn() {
+	void printIn() { // Prints all nodes pointing towards the current node
 		int n = 0;
 		listNode* itt = inNodes;
 		cout << ID << "  In Nodes: ";
@@ -186,7 +203,7 @@ public:
 		}
 		cout << endl << "In degree: " << n << endl;
 	}
-	void printOut() {
+	void printOut() { // Prints all nodes the current node is pointing towards
 		int n = 0;
 		listNode* itt = outNodes;
 		cout << ID << "  Out Nodes: ";
@@ -203,19 +220,19 @@ public:
 };
 
 class graph {
-	listNode* list;
+	listNode* list; // Main linked list which keeps track of all exisiting vertices 
 	adjacencyListNode* adjacencyListHead; // undirected
 
 	bool EdgeIsPresent(int fromId, int toId) {
 		adjacencyListNode* itt = adjacencyListHead;
-		while (itt != 0) {  // iterating through adjacency list and checking if edge exists(undirected).
+		while (itt != 0) {  // iterating through adjacency list and checking if an undirected edge exists
 			if (fromId == itt->from && toId == itt->to) {
 				return true;
 			}
 			itt = itt->next;
 		}
 		itt = adjacencyListHead;
-		while (itt != 0) {  // iterating through adjacency list and checking if edge exists.
+		while (itt != 0) {  // iterating through adjacency list and checking if edge exists (reversing from and to)
 			if (toId == itt->from && fromId == itt->to) {
 				return true;
 			}
@@ -288,13 +305,15 @@ class graph {
 			}
 		}
 	}
+
+
 public:
 	// prerequisites
 	graph() {
 		list = 0;
 		adjacencyListHead = 0;
 	}
-	void createTree(string filePath) {
+	void createGraph(string filePath) {
 		listNode* fromNode, *toNode;
 		string buffer, subBuffer;
 		int fromID, toID;
@@ -364,7 +383,7 @@ public:
 		}
 	}
 
-	// Part 1
+	// Parts 1, 2, 3, 4, 5
 	void numberOfNodes() {
 		int no = 0;
 		listNode* itt = list;
@@ -372,7 +391,7 @@ public:
 			no++;
 			itt = itt->next;
 		}
-		cout << no << endl;
+		cout << "Number of nodes: " << no << endl;
 	}
 	void numberOfEdges() {
 		adjacencyListNode* itt = adjacencyListHead;
@@ -381,7 +400,7 @@ public:
 			no++;
 			itt = itt->next;
 		}
-		cout << "Number of Edges(Undirected): " << no << endl;
+		cout << "Number of undirected edges: " << no << endl;
 	}
 	void numberOfSourceNodes() {
 		int n = 0;
@@ -392,7 +411,7 @@ public:
 			}
 			itt = itt->next;
 		}
-		cout << "Number of Source Nodes: " << n << endl;
+		cout << "Number of source nodes: " << n << endl;
 	}
 	void numberOfSinkNodes() {
 		int n = 0;
@@ -403,7 +422,7 @@ public:
 			}
 			itt = itt->next;
 		}
-		cout << "Number of Sink Nodes: " << n << endl;
+		cout << "Number of sink nodes: " << n << endl;
 	}
 	void numberOfIsolatedNodes() {
 		int n = 0;
@@ -414,7 +433,7 @@ public:
 			}
 			itt = itt->next;
 		}
-		cout << "Number of Isolated Nodes: " << n << endl;
+		cout << "Number of isolated nodes: " << n << endl;
 	}
 	bool IsolatedVertex() {
 		listNode* itt = list;
@@ -424,7 +443,9 @@ public:
 		}
 	}
 
-	// Part 2
+	// Parts 8 and 9
+
+	// Parts 10 and 11
 	void displayInDegree(int n = -1) {
 		if (n == -1) {
 			listNode* itt = list;
@@ -464,8 +485,5 @@ public:
 		}
 		
 	}
-
-	// Part 3
-
 };
 
