@@ -11,8 +11,9 @@ int main() {
 	G1.numberOfSourceNodes();
 	G1.numberOfSinkNodes();
 	G1.numberOfIsolatedNodes();
+	G1.noOfArticulationNodes();
 
 	// Part 2
-	//G1.displayInDegree();
-	G1.displayOutDegree();
+	/*G1.displayInDegree();
+	G1.displayOutDegree();*/
 }

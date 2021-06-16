@@ -1,4 +1,5 @@
 #pragma once
+
 #include<iostream>
 #include<fstream>
 #include<string>
@@ -43,10 +44,10 @@ struct Queue {
 	}
 	vertex* dequeue() {
 		vertex* ret;
-		if (front->next == 0) {
-			ret = front->address;
+		if (front == 0) {
 			delete front;
 			front = rear = 0;
+			return 0;
 		}
 		else {
 			QNode* temp = front;
@@ -89,6 +90,16 @@ public:
 			head->address = A;
 			size++;
 		}
+		else {
+			visitedListNode* temp = new visitedListNode;
+			temp->address = A;
+			size++;
+			temp->next = head;
+			head = temp;
+		}
+	}
+	int getSize() {
+		return size;
 	}
 	bool checkIfVisited(vertex* v) {
 		visitedListNode* itt = head;
@@ -200,6 +211,9 @@ public:
 	listNode* getInNode() {
 		return inNodes;
 	}
+	listNode* getOutNode() {
+		return outNodes;
+	}
 };
 
 class graph {
@@ -269,24 +283,65 @@ class graph {
 			return temp;
 		}
 	}
-	bool articulationNodeCheck(listNode* check) {
+	int countArticulation() {
+		listNode* itt = list;
+		int n = 0;
+		while (itt != 0) {
+			if (articulationNodeCheck(itt, itt)) {
+				n++;
+			}
+			itt = itt->next;
+		}
+		return n;
+	}
+	int countNodes() {
+		int no = 0;
+		listNode* itt = list;
+		while (itt != 0) {
+			no++;
+			itt = itt->next;
+		}
+		return no;
+	}
+ 	bool articulationNodeCheck(listNode* check, listNode* starting) {
 		// Checking through BFS.
 		Queue q1;
 		visitedList visited;
-		vertex* v;
-		listNode* itt = v->getInNode();
+		vertex* v = starting->address;  // selecting first node to visit.
+		if (check->address == v) {  // if first node to visit is the same node as the one we want to check for articulation.
+			if (starting->next != 0) {
+				v = starting->next->address;  // select other node.
+			}
+			else {
+				return false;
+			}
+		}
+		listNode* itt = v->getOutNode();  // initialising iterator to iterate all.
+		if (itt == 0) {  // As it is leaf node(in trees language) i.e. only 1 node is pointing to it and it wouldn't disconnect any part of the graph
+			return false;
+		}
 		visited.add(v);
-		q1.enqueue(list->address);
+		q1.enqueue(v);
 		while (!q1.isEmpty()) {
 			v = q1.dequeue();
 			while (itt != 0) {
 				q1.enqueue(itt->address);
-				if (!visited.checkIfVisited(itt->address)) {
+				itt = v->getOutNode();
+				if (itt == 0) {
+					break;
+				}
+				else if (!visited.checkIfVisited(itt->address)) {
 					visited.add(itt->address);
 				}
 				itt = itt->next;
 			}
 		}
+		int temp = visited.getSize();
+		int temp2 = countNodes();
+		if (visited.getSize() != countNodes() - 1) {
+			return true;
+		}
+		return false;
 	}
 public:
 	// prerequisites
@@ -366,13 +421,7 @@ public:
 
 	// Part 1
 	void numberOfNodes() {
-		int no = 0;
-		listNode* itt = list;
-		while (itt != 0) {
-			no++;
-			itt = itt->next;
-		}
-		cout << no << endl;
+		cout << "Number Of Total Nodes: " << countNodes() << endl;
 	}
 	void numberOfEdges() {
 		adjacencyListNode* itt = adjacencyListHead;
@@ -416,12 +465,8 @@ public:
 		}
 		cout << "Number of Isolated Nodes: " << n << endl;
 	}
-	bool IsolatedVertex() {
-		listNode* itt = list;
-		while (itt != 0) {
-			articulationNodeCheck(itt);
-			itt = itt->next;
-		}
+	void noOfArticulationNodes() {
+		cout << "Articulation Nodes: " << countArticulation() << endl;
 	}
 
 	// Part 2
