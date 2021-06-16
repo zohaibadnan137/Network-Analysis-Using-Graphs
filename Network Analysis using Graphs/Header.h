@@ -78,7 +78,7 @@ struct Queue {
 		return ret;
 	}
 	bool isEmpty() {
-		if (/*front == rear == 0*/ !size) {
+		if (front == rear == 0 || !size) {
 			return true;
 		}
 		return false;
@@ -325,14 +325,19 @@ class graph {
 	int countArticulation() {
 		listNode* itt = list;
 		int n = 0;
-		while (itt != 0) {
+		while (itt->next != 0) {
 			if (articulationNodeCheck(itt, itt)) {
 				n++;
 			}
 			itt = itt->next;
 		}
+		itt = itt->next;
+		if (articulationNodeCheck(itt, list)) {
+			n++;
+		}
 		return n;
 	}
+
 	int countNodes() {
 		int no = 0;
 		listNode* itt = list;
@@ -342,42 +347,43 @@ class graph {
 		}
 		return no;
 	}
- 	bool articulationNodeCheck(listNode* check, listNode* starting) {
-		// Checking through BFS.
-		Queue q1;
-		visitedList visited;
-		vertex* v = starting->address;  // selecting first node to visit.
-		if (check->address == v) {  // if first node to visit is the same node as the one we want to check for articulation.
-			if (starting->next != 0) {
-				v = starting->next->address;  // select other node.
-			}
-			else {
-				return false;
-			}
-		}
-		listNode* itt = v->getOutNode();  // initialising iterator to iterate all.
-		if (itt == 0) {  // As it is leaf node(in trees language) i.e. only 1 node is pointing to it and it wouldn't disconnect any part of the graph
+ 	bool articulationNodeCheck(listNode* starting, listNode* check) {
+		if (check == 0 || starting == 0) {
 			return false;
 		}
-		visited.add(v);
-		q1.enqueue(v);
-		while (!q1.isEmpty()) {
-			v = q1.dequeue();
-			itt = v->getOutNode();
+		Queue q;
+		int n = 0;
+		visitedList v;
+		vertex* vtx;
+		v.add(check->address);
+		if (check == starting) {
+			vtx = starting->next->address;
+			q.enqueue(vtx);
+			v.add(vtx);
+		}
+		else {
+			vtx = starting->address;
+			q.enqueue(vtx);
+			v.add(vtx);
+		}
+		listNode* itt = vtx->getOutNode();  // initialising iterator to iterate all.
+		if (itt == 0) {
+			return false;
+		}
+		while (!q.isEmpty()) {
+			vtx = q.dequeue();
+			itt = vtx->getOutNode();
 			while (itt != 0) {
-				q1.enqueue(itt->address);
-				if (itt == 0) {
-					break;
+				if (itt == check) {
+					continue;
 				}
-				else if (!visited.checkIfVisited(itt->address)) {
-					visited.add(itt->address);
+				else if (!v.checkIfVisited(itt->address)){
+					v.add(itt->address);
 				}
 				itt = itt->next;
 			}
 		}
-		int temp = visited.getSize();
-		int temp2 = countNodes();
-		if (visited.getSize() != (countNodes() - 1)) {
+		if (n != (countNodes() - 1)) {
 			return true;
 		}
 		return false;
@@ -406,7 +412,7 @@ public:
 		getline(file, buffer);
 		getline(file, buffer);
 		getline(file, buffer);
-		while (counter < 10) {  // initially 10 to test on small dataset.
+		while (true) {  // initially 10 to test on small dataset.
 			getline(file, buffer);  // reading line.
 			if (buffer == "") {
 				break;
@@ -460,7 +466,7 @@ public:
 		}
 	}
 
-	// Parts 1, 2, 3, 4, 5
+	// Parts 1, 2, 3, 4, 5, 6
 	void numberOfNodes() {
 		int no = 0;
 		listNode* itt = list;
