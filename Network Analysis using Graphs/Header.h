@@ -153,13 +153,17 @@ public:
 
 struct adjacencyListNode {
 	int from;
+	vertex* fromN;
 	int to;
+	vertex* toN;
 
 	adjacencyListNode* next;
 
 	adjacencyListNode() {
 		from = 0;
+		fromN = 0;
 		to = 0;
+		toN = 0;
 		next = 0;
 	}
 };
@@ -281,7 +285,10 @@ class graph {
 		if (adjacencyListHead == 0) {  // creating first node.
 			adjacencyListHead = new adjacencyListNode;
 			adjacencyListHead->from = fromVertex->address->getID();  // assigning ID
+			adjacencyListHead->fromN = fromVertex->address;
 			adjacencyListHead->to = toVertex->address->getID();   // assigning ID
+			adjacencyListHead->toN = toVertex->address;
+
 		}
 		else {
 			adjacencyListNode* temp = new adjacencyListNode;
@@ -337,7 +344,6 @@ class graph {
 		}
 		return n;
 	}
-
 	int countNodes() {
 		int no = 0;
 		listNode* itt = list;
@@ -377,7 +383,7 @@ class graph {
 				if (itt == check) {
 					continue;
 				}
-				else if (!v.checkIfVisited(itt->address)){
+				else if (!v.checkIfVisited(itt->address)) {
 					v.add(itt->address);
 				}
 				itt = itt->next;
@@ -387,6 +393,18 @@ class graph {
 			return true;
 		}
 		return false;
+	}
+	
+	
+	bool bridgeCheck(adjacencyListNode* check) {
+		Queue q;
+		visitedList v;
+		listNode* vtx = list;
+		if (vtx->address == check->fromN) {
+			return false;
+		}
+		v.add(vtx->address);
+		q.enqueue(vtx->address);
 	}
 
 
@@ -520,6 +538,9 @@ public:
 	}
 	void noOfArticulationNodes() {
 		cout << "Articulation Nodes: " << countArticulation() << endl;
+	}
+	void noOfBridgeEdges() {
+
 	}
 
 	// Parts 8 and 9
