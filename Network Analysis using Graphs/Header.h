@@ -57,14 +57,17 @@ struct Queue {
 			QNode* temp = new QNode;
 			temp->address = A;
 			rear->next = temp;
-			rear = rear->next;
+			rear = rear->next; 
 		}
 		size++;
 		return;
 	}
 	vertex* dequeue() {
 		vertex* ret = 0;
-		if (front == 0) {
+		if (front == 0)
+			return 0;
+		if (front->next == 0) {
+			ret = front->address;
 			delete front;
 			front = rear = 0;
 		}
@@ -74,11 +77,11 @@ struct Queue {
 			front = front->next;
 			delete temp;
 		}
-		size--;
+			size--;
 		return ret;
 	}
 	bool isEmpty() {
-		if (front == rear == 0 || !size) {
+		if (!size) {
 			return true;
 		}
 		return false;
@@ -259,7 +262,7 @@ class graph {
 	listNode* list; // Main linked list which keeps track of all exisiting vertices 
 	adjacencyListNode* adjacencyListHead; // undirected
 
-	bool EdgeIsPresent(int fromId, int toId) {
+	bool EdgeIsPresent(int fromId, int toId) { 
 		adjacencyListNode* itt = adjacencyListHead;
 		while (itt != 0) {  // iterating through adjacency list and checking if an undirected edge exists
 			if (fromId == itt->from && toId == itt->to) {
@@ -337,7 +340,6 @@ class graph {
 		}
 		return n;
 	}
-
 	int countNodes() {
 		int no = 0;
 		listNode* itt = list;
@@ -447,7 +449,6 @@ public:
 		}
 		file.close();
 	}
-	
 	void displayNodes() {
 		listNode* itt = list;
 		while (itt != 0) {
@@ -519,7 +520,7 @@ public:
 		cout << "Number of isolated nodes: " << n << endl;
 	}
 	void noOfArticulationNodes() {
-		cout << "Articulation Nodes: " << countArticulation() << endl;
+		cout << "Number of articulation nodes: " << countArticulation() << endl;
 	}
 
 	// Parts 8 and 9
@@ -548,8 +549,6 @@ public:
 			while (inQueue > 0)
 			{
 				vertex* temp1 = q.dequeue();
-				//if (temp2->getID() == destID)
-					//goto next;
 				listNode* temp2 = temp1->getOutNode();
 				while (temp2 != 0)
 				{
@@ -566,8 +565,26 @@ public:
 			}
 			length++;
 		}
+		cout << "No path exists between " << srcID << " and " << destID << "." << endl;
+		return;
 	next:
 		cout << "The shortest path between " << srcID << " and " << destID << " is " << length << "." << endl;
+		return;
+	}
+	void findAllShortestPaths()
+	{
+		listNode* itt1 = list;
+		while (itt1 != 0)
+		{
+			listNode* itt2 = list;
+			while (itt2 != 0)
+			{
+				if (itt1 != itt2)
+					findShortestPath(itt1->address->getID(), itt2->address->getID());
+				itt2 = itt2->next;
+			}
+			itt1 = itt1->next;
+		}
 		return;
 	}
 
@@ -610,5 +627,9 @@ public:
 			}
 		}		
 	}
+
+	// Parts 12 and 13
+	
+	// Parts 13 and 14
 };
 
