@@ -12,12 +12,15 @@ int main() {
 	G1.numberOfEdges();
 	//G1.numberOfSourceNodes();
 	G1.numberOfSinkNodes();
-	//G1.numberOfIsolatedNodes();
-	//G1.noOfArticulationNodes();
+	G1.numberOfIsolatedNodes();
+	G1.noOfArticulationNodes();
+
 	//G1.findShortestPath(3466, 10310);
 	//G1.findShortestPath(3466, 1854);
 	//G1.findShortestPath(3466, 495);
-	//G1.findShortestPath(3466, 9458);
+	//G1.findShortestPath(3466, 17968);
+	G1.findShortestPath(14845, 9450);
+	//G1.findAllShortestPaths();
 
 	// Part 2
 	/*G1.displayInDegree();
