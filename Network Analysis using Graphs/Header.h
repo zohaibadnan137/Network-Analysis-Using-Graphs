@@ -445,6 +445,39 @@ class graph {
 		}
 		return currVer;
 	}
+	componentListNode* findUnion(vertex* v)
+	{
+		componentListNode* curr = new componentListNode;
+		curr->ver = v;
+
+		listNode* out = v->getOutNode();
+
+		while (out != 0)
+		{
+			curr->addBi(out->address);
+			out = out->next;
+		}
+
+		listNode* in = v->getInNode();
+		while (in != 0)
+		{
+			listNode* temp = curr->bi;
+			bool flag = false;
+			while (temp != 0)
+			{
+				if (temp->address->getID() == in->address->getID())
+				{
+					flag = true;
+					break;
+				}
+				temp = temp->next;
+			}
+			if (!flag)
+				curr->addBi(in->address);
+			in = in->next;
+		}
+		return curr;
+	}
 
 public:
 	// prerequisites
@@ -706,7 +739,7 @@ public:
 		componentListNode* currComp = compHead;
 		while (currComp != 0)
 		{
-			if (currComp->size >= max)
+			if (currComp->size > max)
 			{
 				max = currComp->size;
 				maxComp = currComp;
@@ -726,7 +759,7 @@ public:
 
 		return;
 	}
-	void displaySCC()
+	/*void displaySCC()
 	{
 		listNode* curr = list;
 		componentListNode* compHead = 0;
@@ -770,6 +803,71 @@ public:
 
 		cout << "size: " << s << endl;
 	}
+	*/
+	void displaySCC()
+	{
+		// Populate component list
+		listNode* curr = list;
+		componentListNode* compHead = 0;
+		while (curr != 0)
+		{
+			componentListNode* temp = findBi(curr->address);
+			if (compHead == 0)
+				compHead = temp;
+			else
+			{
+				temp->next = compHead;
+				compHead = temp;
+			}
+			curr = curr->next;
+		}
+
+		visitedList v1;
+	}
+
 	// Parts 13 and 14
+	void findLargestWCC()
+	{
+		listNode* curr = list;
+		componentListNode* componentListHead = 0;
+		while (curr != 0)
+		{
+			componentListNode* temp = findUnion(curr->address);
+			if (componentListHead == 0)
+				componentListHead = temp;
+			else
+			{
+				temp->next = componentListHead;
+				componentListHead = temp;
+			}
+			curr = curr->next;
+		}
+
+		int max = 0;
+		componentListNode* maxComponent = 0;
+
+		componentListNode* currComponent = componentListHead;
+		while (currComponent != 0)
+		{
+			if (currComponent->size > max)
+			{
+				max = currComponent->size;
+				maxComponent = currComponent;
+			}
+			currComponent = currComponent->next;
+		}
+
+		cout << "The size of the largest weakly connected component is " << max << "." << endl;
+		cout << maxComponent->ver->getID();
+
+		listNode* temp = maxComponent->bi;
+		while (temp != 0)
+		{
+			cout << " - " << temp->address->getID();
+			temp = temp->next;
+		}
+
+		return;
+	}
 };
 
