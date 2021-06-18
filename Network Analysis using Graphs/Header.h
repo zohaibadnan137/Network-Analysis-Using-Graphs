@@ -262,6 +262,87 @@ public:
 	}
 };
 
+struct BFSListNode {
+	int ID;
+	int state;  // 0: not visited, 1: visited, 2: complete
+	BFSListNode* next;
+};
+
+class BFSList {
+	BFSListNode* head;
+
+public:
+	BFSList() {
+		head = 0;
+	}
+	void create(listNode* H) {
+		listNode* itt = H;
+		BFSListNode* ittNew = head;
+		while (itt != 0) {
+			if (ittNew == 0) {
+				ittNew = new BFSListNode;
+				head = ittNew;
+			}
+			else {
+				ittNew->next = new BFSListNode;
+				ittNew = ittNew->next;
+			}
+			ittNew->ID = itt->address->getID();
+			ittNew->state = 0;
+			itt = itt->next;
+		}
+	}
+	void markVisited(int id) {
+		BFSListNode* itt = head;
+		while (itt != 0) {
+			if (itt->ID == id) {
+				itt->state = 1;
+				return;
+			}
+			itt = itt->next;
+		}
+	}
+	void markComplete(int id) {
+		BFSListNode* itt = head;
+		while (itt != 0) {
+			if (itt->ID == id) {
+				itt->state = 2;
+				return;
+			}
+			itt = itt->next;
+		}
+	}
+	bool checkStatus(int id){
+		BFSListNode* itt = head;
+		while (itt != 0) {
+			if (itt->ID == id) {
+				return itt->state;
+			}
+			itt = itt->next;
+		}
+	}
+	bool checkAllStatus() {
+		BFSListNode* itt = head;
+		while (itt != 0) {
+			if (itt->state != 2) {
+				return false;
+			}
+			itt = itt->next;
+		}
+		return true;
+	}
+};
+
+template <typename T>
+int findIndex(T find, T* Arr, int size) {
+	for (int i = 0, i < size, i++) {
+		if (arr[i] == find) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 class graph {
 	listNode* list; // Main linked list which keeps track of all exisiting vertices 
 	adjacencyListNode* adjacencyListHead; // undirected
@@ -398,16 +479,92 @@ class graph {
 		return false;
 	}
 	
-	
+	int countBridges() {
+		int noOfVertices = countNodes();
+		bool* visited = new bool[noOfVertices];
+		int* lowestTime = new int[noOfVertices];
+		int* discoveryTime = new int[noOfVertices];
+		int* parentOf = new int[noOfVertices] {-1};
+		int time = 0;
+		adjacencyListNode* itt = adjacencyListHead;
+		listNode* vItt = list;
+		int* listOfVertices = new int[noOfVertices];
+		for (int i = 0; i < noOfVertices; i++) {
+			listOfVertices[i] = vItt->address->getID();
+			vItt = vItt->next;
+		}
+		while (itt) {
+			//isBridge(adjacencyListHead, noOfVertices, itt->from, itt->to, listOfVertices);
+			itt = itt->next;
+		}
+	}
+
+	void findAP(int vtxIndex, bool* visited, int* lowestTime, int* discoveryTime, int* allVertices, int* parent, int noOfVertices) {
+		int time = 0;
+		visited[vtxIndex] = true;
+		lowestTime[vtxIndex] = discoveryTime[vtxIndex] = time++;
+		int child = 0;
+		adjacencyListNode* itt = adjacencyListHead;
+		while (itt) {
+			if (allVertices[vtxIndex] == itt->from) {
+				if (!visited[vtxIndex]) {
+					child++;
+					parent[findIndex(itt->to, allVertices, noOfVertices)] = vtxIndex;
+					findAP();
+				}
+			}
+			if (allVertices[vtxIndex] == itt->to) {
+
+			}
+		}
+	}
+
+	bool isBridge(adjacencyListNode*& edgesList, const int& noOFVertices, const int& fromID, const int& toID, const int* verticeIDs) {
+		
+		return true;
+	}
+
 	bool bridgeCheck(adjacencyListNode* check) {
+		int n = 0;
 		Queue q;
-		visitedList v;
-		listNode* vtx = list;
-		if (vtx->address == check->fromN) {
+		BFSList visited;
+		vertex* vtx = list->address;
+		listNode* itt = list;
+		visited.create(list);
+		visited.markVisited(vtx->getID());
+		while (vtx->getOutNode() == 0) {
+			vtx = itt->address;
+			itt = itt->next;
+		}
+		q.enqueue(vtx);
+		while (!q.isEmpty()) {
+			vtx = q.dequeue();
+			itt = vtx->getOutNode();
+			while (itt != 0) {
+				if (visited.checkStatus(itt->address->getID()) == 0) {
+					if (vtx->getID() == check->from && itt->address->getID() == check->to) {
+						itt = itt->next;
+						continue;
+					}
+					else if (vtx->getID() == check->to && itt->address->getID() == check->from) {
+						itt = itt->next;
+						continue;
+					}
+					else {
+						q.enqueue(itt->address);
+						visited.markVisited(itt->address->getID());
+					}
+				}
+				itt = itt->next;
+			}
+			visited.markComplete(vtx->getID());
+			n++;
+		}
+		cout << n << endl;
+		if (visited.checkAllStatus()) {
 			return false;
 		}
-		v.add(vtx->address);
-		q.enqueue(vtx->address);
+		return true;
 	}
 
 
@@ -433,7 +590,7 @@ public:
 		getline(file, buffer);
 		getline(file, buffer);
 		getline(file, buffer);
-		while (true) {  // initially 10 to test on small dataset.
+		while (counter < 5000) {  // initially 10 to test on small dataset.
 			getline(file, buffer);  // reading line.
 			if (buffer == "") {
 				break;
@@ -542,7 +699,15 @@ public:
 		cout << "Number of articulation nodes: " << countArticulation() << endl;
 	}
 	void noOfBridgeEdges() {
-
+		adjacencyListNode* itt = adjacencyListHead;
+		int n = 0;
+		while (itt != 0) {
+			if (bridgeCheck(itt)) {
+				n++;
+			}
+			itt = itt->next;
+		}
+		cout << "Number of Bridge Edges: " << n << endl;
 	}
 
 	// Parts 8 and 9
