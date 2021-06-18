@@ -177,6 +177,38 @@ struct listNode {
 	}
 };
 
+struct componentListNode
+{
+	// Data members 
+	vertex* ver; // Points to the current vertex
+	listNode* bi; // Stores nodes that have a bidirectional edge with the current node
+	int size; // Stores number of bidirectional edges that the current node has
+
+	componentListNode* next;
+
+	componentListNode()
+	{
+		ver = 0;
+		bi = 0;
+		size = 0;
+		next = 0;
+	}
+
+	void addBi(vertex* add)
+	{
+		listNode* temp = new listNode;
+		temp->address = add;
+		if (bi == 0)
+			bi = temp;
+		else
+		{
+			temp->next = bi;
+			bi = temp;
+		}
+		size++;
+	}
+};
+
 class vertex {
 
 	int ID;
@@ -390,7 +422,29 @@ class graph {
 		}
 		return false;
 	}
+	componentListNode* findBi(vertex* v)
+	{
+		componentListNode* currVer = new componentListNode;
+		currVer->ver = v;
 
+		// Open the out and in linked lists for the current vertex
+		listNode* out = v->getOutNode();
+		listNode* in;
+
+		while (out != 0)
+		{
+			// For each vertex in the out list, check whether it exists in the in list
+			in = v->getInNode();
+			while (in != 0)
+			{
+				if (out->address->getID() == in->address->getID())
+					currVer->addBi(out->address); // Add the current out vertex because it has a bidirectional relationship with the current vertex
+				in = in->next;
+			}
+			out = out->next;
+		}
+		return currVer;
+	}
 
 public:
 	// prerequisites
@@ -629,7 +683,93 @@ public:
 	}
 
 	// Parts 12 and 13
-	
+	void findLargestSCC()
+	{
+		listNode* curr = list;
+		componentListNode* compHead = 0;
+		while (curr != 0)
+		{
+			componentListNode* temp = findBi(curr->address);
+			if (compHead == 0)
+				compHead = temp;
+			else
+			{
+				temp->next = compHead;
+				compHead = temp;
+			}
+			curr = curr->next;
+		}
+
+		int max = 0;
+		componentListNode* maxComp = 0;
+
+		componentListNode* currComp = compHead;
+		while (currComp != 0)
+		{
+			if (currComp->size >= max)
+			{
+				max = currComp->size;
+				maxComp = currComp;
+			}
+			currComp = currComp->next;
+		}
+
+		cout << "The size of the largest strongly connected component is " << max << "." << endl;
+		cout << maxComp->ver->getID();
+
+		listNode* temp = maxComp->bi;
+		while (temp != 0)
+		{
+			cout << " - " << temp->address->getID();
+			temp = temp->next;
+		}
+
+		return;
+	}
+	void displaySCC()
+	{
+		listNode* curr = list;
+		componentListNode* compHead = 0;
+		while (curr != 0)
+		{
+			componentListNode* temp = findBi(curr->address);
+			if (compHead == 0)
+				compHead = temp;
+			else
+			{
+				temp->next = compHead;
+				compHead = temp;
+			}
+			curr = curr->next;
+		}
+
+		visitedList v1;
+
+		componentListNode* itt = compHead;
+
+		int s = 0;
+		while (itt != 0)
+		{
+			if (!v1.checkIfVisited(itt->ver))
+			{
+				v1.add(itt->ver);
+				s += itt->size;
+				cout << itt->ver->getID();
+				listNode* itt2 = itt->bi;
+				while (itt2 != 0)
+				{
+					v1.add(itt2->address);
+					cout << " - " << itt2->address->getID();
+					itt2 = itt2->next;
+				}
+				cout << endl;
+				cout << endl;
+			}
+			itt = itt->next;
+		}
+
+		cout << "size: " << s << endl;
+	}
 	// Parts 13 and 14
 };
 
