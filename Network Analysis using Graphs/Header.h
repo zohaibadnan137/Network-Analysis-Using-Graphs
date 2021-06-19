@@ -8,6 +8,7 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+
 using namespace std;
 
 //**************** Structure and Class Prototypes ****************//
@@ -870,4 +871,3 @@ public:
 		return;
 	}
 };
-

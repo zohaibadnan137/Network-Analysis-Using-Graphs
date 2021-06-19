@@ -1,8 +1,7 @@
 #include"Header.h"
 
 int main() {
-	//string dataPath = "C:\\Users\\abdul\\source\\repos\\Network Analysis using Graphs\\Network Analysis using Graphs\\Text.txt";
-	string dataPath = "C:\\Users\\zohai\\Desktop\\CA-GrQc.txt";
+	string dataPath = "./Text.txt";
 	graph G1;
 	G1.createGraph(dataPath);
 
