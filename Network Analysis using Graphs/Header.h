@@ -214,7 +214,7 @@ struct componentListNode
 	{
 		ver = 0;
 		bi = 0;
-		size = 0;
+		size = 1;
 		next = 0;
 	}
 
@@ -892,7 +892,7 @@ public:
 		}
 
 		int max = 0;
-		componentListNode* maxComp = 0;
+		componentListNode* maxComponent = NULL;
 
 		componentListNode* currComp = compHead;
 		while (currComp != 0)
@@ -900,68 +900,23 @@ public:
 			if (currComp->size > max)
 			{
 				max = currComp->size;
-				maxComp = currComp;
+				maxComponent = currComp;
 			}
 			currComp = currComp->next;
 		}
 
 		cout << "The size of the largest strongly connected component is " << max << "." << endl;
-		cout << maxComp->ver->getID();
+		cout << maxComponent->ver->getID();
 
-		listNode* temp = maxComp->bi;
+		listNode* temp = maxComponent->bi;
 		while (temp != 0)
 		{
 			cout << " - " << temp->address->getID();
 			temp = temp->next;
 		}
-
+		cout << endl;
 		return;
 	}
-	/*void displaySCC()
-	{
-		listNode* curr = list;
-		componentListNode* compHead = 0;
-		while (curr != 0)
-		{
-			componentListNode* temp = findBi(curr->address);
-			if (compHead == 0)
-				compHead = temp;
-			else
-			{
-				temp->next = compHead;
-				compHead = temp;
-			}
-			curr = curr->next;
-		}
-
-		visitedList v1;
-
-		componentListNode* itt = compHead;
-
-		int s = 0;
-		while (itt != 0)
-		{
-			if (!v1.checkIfVisited(itt->ver))
-			{
-				v1.add(itt->ver);
-				s += itt->size;
-				cout << itt->ver->getID();
-				listNode* itt2 = itt->bi;
-				while (itt2 != 0)
-				{
-					v1.add(itt2->address);
-					cout << " - " << itt2->address->getID();
-					itt2 = itt2->next;
-				}
-				cout << endl;
-				cout << endl;
-			}
-			itt = itt->next;
-		}
-
-		cout << "size: " << s << endl;
-	}
-	*/
 	void displaySCC()
 	{
 		// Populate component list
@@ -980,7 +935,22 @@ public:
 			curr = curr->next;
 		}
 
-		visitedList v1;
+		componentListNode* currComp = compHead;
+
+		while (currComp != 0)
+		{
+			cout << "Size: " << currComp->size << endl;
+			cout << currComp->ver->getID();
+			listNode * temp = currComp->bi;
+			while (temp != 0)
+			{
+				cout << " - " << temp->address->getID();
+				temp = temp->next;
+			}
+			cout << endl;
+			currComp = currComp->next;
+		}
+		return;
 	}
 
 	// Parts 13 and 14
@@ -1024,7 +994,40 @@ public:
 			cout << " - " << temp->address->getID();
 			temp = temp->next;
 		}
+		cout << endl;
+		return;
+	}
+	void displayWCC()
+	{
+		listNode* curr = list;
+		componentListNode* componentListHead = 0;
+		while (curr != 0)
+		{
+			componentListNode* temp = findUnion(curr->address);
+			if (componentListHead == 0)
+				componentListHead = temp;
+			else
+			{
+				temp->next = componentListHead;
+				componentListHead = temp;
+			}
+			curr = curr->next;
+		}
 
+		componentListNode* currComponent = componentListHead;
+		while (currComponent != 0)
+		{
+			cout << "Size: " << currComponent->size << endl;
+			cout << currComponent->ver->getID();
+			listNode* temp = currComponent->bi;
+			while (temp != 0)
+			{
+				cout << " - " << temp->address->getID();
+				temp = temp->next;
+			}
+			cout << endl;
+			currComponent = currComponent->next;
+		}
 		return;
 	}
 };

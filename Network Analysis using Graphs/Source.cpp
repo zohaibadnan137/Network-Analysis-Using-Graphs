@@ -34,6 +34,15 @@ int main()
 					switch (menu.GetPressedItem())
 					{
 					case 0:
+						G1.numberOfNodes();
+						G1.numberOfEdges();
+						G1.numberOfSourceNodes();
+						G1.numberOfSinkNodes();
+						G1.numberOfIsolatedNodes();
+						G1.noOfBridgeEdges();
+						G1.noOfArticulationNodes();
+						G1.findLargestSCC();
+						G1.findLargestWCC();
 						break;
 					case 1:
 						G1.numberOfNodes();
@@ -57,8 +66,15 @@ int main()
 						G1.noOfArticulationNodes();
 						break;
 					case 8:
+						int src, dest;
+						cout << "Enter the source vertex:" << endl;
+						cin >> src;
+						cout << "Enter the destination vertex:" << endl;
+						cin >> dest;
+						G1.findShortestPath(src, dest);
 						break;
 					case 9:
+						cout << "Error 404: code not found." << endl;
 						break;
 					case 10:
 						G1.displayInDegree();
@@ -70,11 +86,13 @@ int main()
 						G1.findLargestSCC();
 						break;
 					case 13:
+						G1.displaySCC();
 						break;
 					case 14:
 						G1.findLargestWCC();
 						break;
 					case 15:
+						G1.displayWCC();
 						break;
 					}
 					break;
