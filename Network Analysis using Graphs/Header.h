@@ -8,6 +8,7 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+
 using namespace std;
 
 //**************** Structure and Class Prototypes ****************//
@@ -197,6 +198,38 @@ struct listNode {
 	listNode() {
 		address = 0;
 		next = 0;
+	}
+};
+
+struct componentListNode
+{
+	// Data members 
+	vertex* ver; // Points to the current vertex
+	listNode* bi; // Stores nodes that have a bidirectional edge with the current node
+	int size; // Stores number of bidirectional edges that the current node has
+
+	componentListNode* next;
+
+	componentListNode()
+	{
+		ver = 0;
+		bi = 0;
+		size = 0;
+		next = 0;
+	}
+
+	void addBi(vertex* add)
+	{
+		listNode* temp = new listNode;
+		temp->address = add;
+		if (bi == 0)
+			bi = temp;
+		else
+		{
+			temp->next = bi;
+			bi = temp;
+		}
+		size++;
 	}
 };
 
@@ -535,7 +568,62 @@ class graph {
 		}
 		return noOfBridges;
 	}
+	componentListNode* findBi(vertex* v)
+	{
+		componentListNode* currVer = new componentListNode;
+		currVer->ver = v;
 
+		// Open the out and in linked lists for the current vertex
+		listNode* out = v->getOutNode();
+		listNode* in;
+
+		while (out != 0)
+		{
+			// For each vertex in the out list, check whether it exists in the in list
+			in = v->getInNode();
+			while (in != 0)
+			{
+				if (out->address->getID() == in->address->getID())
+					currVer->addBi(out->address); // Add the current out vertex because it has a bidirectional relationship with the current vertex
+				in = in->next;
+			}
+			out = out->next;
+		}
+		return currVer;
+	}
+	componentListNode* findUnion(vertex* v)
+	{
+		componentListNode* curr = new componentListNode;
+		curr->ver = v;
+
+		listNode* out = v->getOutNode();
+
+		while (out != 0)
+		{
+			curr->addBi(out->address);
+			out = out->next;
+		}
+
+		listNode* in = v->getInNode();
+		while (in != 0)
+		{
+			listNode* temp = curr->bi;
+			bool flag = false;
+			while (temp != 0)
+			{
+				if (temp->address->getID() == in->address->getID())
+				{
+					flag = true;
+					break;
+				}
+				temp = temp->next;
+			}
+			if (!flag)
+				curr->addBi(in->address);
+			in = in->next;
+		}
+		return curr;
+	}
 
 
 public:
@@ -787,7 +875,157 @@ public:
 	}
 
 	// Parts 12 and 13
-	
-	// Parts 13 and 14
-};
+	void findLargestSCC()
+	{
+		listNode* curr = list;
+		componentListNode* compHead = 0;
+		while (curr != 0)
+		{
+			componentListNode* temp = findBi(curr->address);
+			if (compHead == 0)
+				compHead = temp;
+			else
+			{
+				temp->next = compHead;
+				compHead = temp;
+			}
+			curr = curr->next;
+		}
 
+		int max = 0;
+		componentListNode* maxComp = 0;
+
+		componentListNode* currComp = compHead;
+		while (currComp != 0)
+		{
+			if (currComp->size > max)
+			{
+				max = currComp->size;
+				maxComp = currComp;
+			}
+			currComp = currComp->next;
+		}
+
+		cout << "The size of the largest strongly connected component is " << max << "." << endl;
+		cout << maxComp->ver->getID();
+
+		listNode* temp = maxComp->bi;
+		while (temp != 0)
+		{
+			cout << " - " << temp->address->getID();
+			temp = temp->next;
+		}
+
+		return;
+	}
+	/*void displaySCC()
+	{
+		listNode* curr = list;
+		componentListNode* compHead = 0;
+		while (curr != 0)
+		{
+			componentListNode* temp = findBi(curr->address);
+			if (compHead == 0)
+				compHead = temp;
+			else
+			{
+				temp->next = compHead;
+				compHead = temp;
+			}
+			curr = curr->next;
+		}
+
+		visitedList v1;
+
+		componentListNode* itt = compHead;
+
+		int s = 0;
+		while (itt != 0)
+		{
+			if (!v1.checkIfVisited(itt->ver))
+			{
+				v1.add(itt->ver);
+				s += itt->size;
+				cout << itt->ver->getID();
+				listNode* itt2 = itt->bi;
+				while (itt2 != 0)
+				{
+					v1.add(itt2->address);
+					cout << " - " << itt2->address->getID();
+					itt2 = itt2->next;
+				}
+				cout << endl;
+				cout << endl;
+			}
+			itt = itt->next;
+		}
+
+		cout << "size: " << s << endl;
+	}
+	*/
+	void displaySCC()
+	{
+		// Populate component list
+		listNode* curr = list;
+		componentListNode* compHead = 0;
+		while (curr != 0)
+		{
+			componentListNode* temp = findBi(curr->address);
+			if (compHead == 0)
+				compHead = temp;
+			else
+			{
+				temp->next = compHead;
+				compHead = temp;
+			}
+			curr = curr->next;
+		}
+
+		visitedList v1;
+	}
+
+	// Parts 13 and 14
+	void findLargestWCC()
+	{
+		listNode* curr = list;
+		componentListNode* componentListHead = 0;
+		while (curr != 0)
+		{
+			componentListNode* temp = findUnion(curr->address);
+			if (componentListHead == 0)
+				componentListHead = temp;
+			else
+			{
+				temp->next = componentListHead;
+				componentListHead = temp;
+			}
+			curr = curr->next;
+		}
+
+		int max = 0;
+		componentListNode* maxComponent = 0;
+
+		componentListNode* currComponent = componentListHead;
+		while (currComponent != 0)
+		{
+			if (currComponent->size > max)
+			{
+				max = currComponent->size;
+				maxComponent = currComponent;
+			}
+			currComponent = currComponent->next;
+		}
+
+		cout << "The size of the largest weakly connected component is " << max << "." << endl;
+		cout << maxComponent->ver->getID();
+
+		listNode* temp = maxComponent->bi;
+		while (temp != 0)
+		{
+			cout << " - " << temp->address->getID();
+			temp = temp->next;
+		}
+
+		return;
+	}
+};
