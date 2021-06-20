@@ -96,9 +96,11 @@ class visitedList {
 	struct visitedListNode {
 		vertex* address;
 		visitedListNode* next;
+		bool visited;
 
 		visitedListNode(vertex* A = 0) {
 			address = A;
+			visited = false;
 			next = 0;
 		}
 	};
@@ -138,6 +140,23 @@ public:
 		}
 		return false;
 	}
+	/*void loadDFSList(listNode* list) {
+		listNode* itt = list;
+		visitedListNode* visitedItt;
+		while (itt) {
+			if (!head) {
+				head = new visitedListNode;
+				visitedItt = head;
+			}
+			else {
+				visitedItt->next = new visitedListNode;
+				visitedItt = visitedItt->next;
+			}
+			visitedItt->address = itt->address;
+			itt = itt->next;
+		}
+
+	}*/
 	~visitedList() // Destructor
 	{
 		if (head != 0) // Do nothing if the list is already empty
@@ -260,87 +279,41 @@ public:
 	listNode* getOutNode() {
 		return outNodes;
 	}
-};
-
-struct BFSListNode {
-	int ID;
-	int state;  // 0: not visited, 1: visited, 2: complete
-	BFSListNode* next;
-};
-
-class BFSList {
-	BFSListNode* head;
-
-public:
-	BFSList() {
-		head = 0;
-	}
-	void create(listNode* H) {
-		listNode* itt = H;
-		BFSListNode* ittNew = head;
-		while (itt != 0) {
-			if (ittNew == 0) {
-				ittNew = new BFSListNode;
-				head = ittNew;
-			}
-			else {
-				ittNew->next = new BFSListNode;
-				ittNew = ittNew->next;
-			}
-			ittNew->ID = itt->address->getID();
-			ittNew->state = 0;
+	int noOfOutNodes() {
+		listNode* itt = inNodes;
+		int n = 0;
+		while (itt) {
+			n++;
 			itt = itt->next;
 		}
-	}
-	void markVisited(int id) {
-		BFSListNode* itt = head;
-		while (itt != 0) {
-			if (itt->ID == id) {
-				itt->state = 1;
-				return;
-			}
-			itt = itt->next;
-		}
-	}
-	void markComplete(int id) {
-		BFSListNode* itt = head;
-		while (itt != 0) {
-			if (itt->ID == id) {
-				itt->state = 2;
-				return;
-			}
-			itt = itt->next;
-		}
-	}
-	bool checkStatus(int id){
-		BFSListNode* itt = head;
-		while (itt != 0) {
-			if (itt->ID == id) {
-				return itt->state;
-			}
-			itt = itt->next;
-		}
-	}
-	bool checkAllStatus() {
-		BFSListNode* itt = head;
-		while (itt != 0) {
-			if (itt->state != 2) {
-				return false;
-			}
-			itt = itt->next;
-		}
-		return true;
+		return n;
 	}
 };
 
-template <typename T>
-int findIndex(T find, T* Arr, int size) {
-	for (int i = 0, i < size, i++) {
-		if (arr[i] == find) {
+int findIndex(vertex* find, vertex** Arr, int size) {
+	for (int i = 0; i < size; i++) {
+		if (Arr[i] == find) {
 			return i;
 		}
 	}
 	return -1;
+}
+int findI(int f, int* arr, int size) {
+	for (int i = 0; i < size; i++) {
+		if (arr[i] == f) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+int min(int n1, int n2) {
+	if (n1 < n2) {
+		return n1;
+	}
+	else {
+		return n2;
+	}
 }
 
 class graph {
@@ -413,159 +386,156 @@ class graph {
 			return temp;
 		}
 	}
-	int countArticulation() {
+	int ArticulationPrerequisites(bool forVertices) {
+		const int noOfVertices = countNodes();
+		int* allVertices = new int[noOfVertices];
 		listNode* itt = list;
-		int n = 0;
-		while (itt->next != 0) {
-			if (articulationNodeCheck(itt, itt)) {
-				n++;
+		int i = 0;
+		while (itt) {
+			allVertices[i] = itt->address->getID();
+			i++;
+			itt = itt->next;
+		}
+		bool* visited = new bool[noOfVertices] {false};
+		int* discoveryTime = new int[noOfVertices] {-1};
+		int* lowestTime = new int[noOfVertices] {-1};
+		int* parent = new int[noOfVertices] {-1};
+		bool* ArticulationPoints = new bool[noOfVertices]{ false };
+		int* time = new int{ 0 };
+
+
+		if (forVertices == false) {
+			int* result = new int{ 0 };
+			for (i = 0; i < noOfVertices; i++) {
+				if (!visited[i]) {
+					findBridge(i, noOfVertices, visited, discoveryTime, lowestTime, allVertices, parent, time, result);
+				}
 			}
-			itt = itt->next;
+			return *result;
 		}
-		itt = itt->next;
-		if (articulationNodeCheck(itt, list)) {
-			n++;
-		}
-		return n;
-	}
-	int countNodes() {
-		int no = 0;
-		listNode* itt = list;
-		while (itt != 0) {
-			no++;
-			itt = itt->next;
-		}
-		return no;
-	}
- 	bool articulationNodeCheck(listNode* starting, listNode* check) {
-		if (check == 0 || starting == 0) {
-			return false;
-		}
-		Queue q;
-		int n = 0;
-		visitedList v;
-		vertex* vtx;
-		v.add(check->address);
-		if (check == starting) {
-			vtx = starting->next->address;
-			q.enqueue(vtx);
-			v.add(vtx);
-		}
+
+
 		else {
-			vtx = starting->address;
-			q.enqueue(vtx);
-			v.add(vtx);
-		}
-		listNode* itt = vtx->getOutNode();  // initialising iterator to iterate all.
-		if (itt == 0) {
-			return false;
-		}
-		while (!q.isEmpty()) {
-			vtx = q.dequeue();
-			itt = vtx->getOutNode();
-			while (itt != 0) {
-				if (itt == check) {
-					continue;
+			for (int i = 0; i < noOfVertices; i++) {
+				if (!visited[i]) {
+					findAP(i, noOfVertices, visited, discoveryTime, lowestTime, allVertices, parent, ArticulationPoints, time);
 				}
-				else if (!v.checkIfVisited(itt->address)) {
-					v.add(itt->address);
-				}
-				itt = itt->next;
 			}
+			int n = 0;
+			for (int i = 0; i < noOfVertices; i++) {
+				if (ArticulationPoints[i] == true) {
+					n++;
+				}
+			}
+			return n;
 		}
-		if (n != (countNodes() - 1)) {
-			return true;
-		}
-		return false;
 	}
-	
-	int countBridges() {
-		int noOfVertices = countNodes();
-		bool* visited = new bool[noOfVertices];
-		int* lowestTime = new int[noOfVertices];
-		int* discoveryTime = new int[noOfVertices];
-		int* parentOf = new int[noOfVertices] {-1};
-		int time = 0;
-		adjacencyListNode* itt = adjacencyListHead;
-		listNode* vItt = list;
-		int* listOfVertices = new int[noOfVertices];
-		for (int i = 0; i < noOfVertices; i++) {
-			listOfVertices[i] = vItt->address->getID();
-			vItt = vItt->next;
-		}
-		while (itt) {
-			//isBridge(adjacencyListHead, noOfVertices, itt->from, itt->to, listOfVertices);
+	void findAP(int init, int noOfVertices, bool* visited, int* discoveryTime, int* lowestTime, int* allVertices, int* parent, bool* ArticulationPoints, int*& time) {
+		// doing DFS
+		int childeren = 0;
+		int u = init, v;
+		visited[u] = true;  // mark as true so that not visited again.
+		discoveryTime[u] = lowestTime[u] = ++*time;  // initially both times are same.
+		adjacencyListNode* itt = adjacencyListHead, *temp;
+		while (itt) {  // iterating through adjacency list
+			temp = itt;
 			itt = itt->next;
+			if (allVertices[u] == temp->from) {  // selecting only ones with particular vertex present.
+				v = findI(temp->to, allVertices, noOfVertices);
+				if (!visited[v]) {
+					childeren++;
+					parent[v] = u;
+					findAP(v, noOfVertices, visited, discoveryTime, lowestTime, allVertices, parent, ArticulationPoints, time);
+					lowestTime[u] = min(lowestTime[u], lowestTime[v]);
+					if (parent[u] == -1 && childeren > 1) {  // if it is starting point and connects 2 or more parts of graph.
+						ArticulationPoints[u] = true;
+					}
+					if (parent[u] != -1 && lowestTime[v] > discoveryTime[u]) {  // vertex is not starting point and there is another way to connect graph as well.
+						ArticulationPoints[u] = true;
+					}
+				}
+				else if (v != parent[u]) {
+					lowestTime[u] = min(lowestTime[u], discoveryTime[v]);  
+				}
+			}
+			if (allVertices[u] == temp->to) {  // for to value as we are assuming graph as undirected.
+				v = findI(temp->from, allVertices, noOfVertices);
+				if (!visited[v]) {
+					childeren++;
+					parent[v] = u;
+					findAP(v, noOfVertices, visited, discoveryTime, lowestTime, allVertices, parent, ArticulationPoints, time);
+					lowestTime[u] = min(lowestTime[u], lowestTime[v]);
+					if (parent[u] == -1 && childeren > 1) {  // if it is starting point and connects 2 or more parts of graph.
+						ArticulationPoints[u] = true;
+					}
+					if (parent[u] != -1 && lowestTime[v] > discoveryTime[u]) {  // vertex is not starting point and there is another way to connect graph as well.
+						ArticulationPoints[u] = true;
+					}
+				}
+				else if (v != parent[u]) {
+					lowestTime[u] = min(lowestTime[u], discoveryTime[v]);
+				}
+			}
 		}
 	}
-
-	void findAP(int vtxIndex, bool* visited, int* lowestTime, int* discoveryTime, int* allVertices, int* parent, int noOfVertices) {
-		int time = 0;
-		visited[vtxIndex] = true;
-		lowestTime[vtxIndex] = discoveryTime[vtxIndex] = time++;
-		int child = 0;
-		adjacencyListNode* itt = adjacencyListHead;
+	void findBridge(int init, int noOfVertices, bool* visited, int* discoveryTime, int* lowestTime, int* allVertices, int* parent, int*& time, int*& result) {
+		int u = init, v;
+		visited[u] = true;
+		discoveryTime[u] = lowestTime[u] = ++*time;
+		adjacencyListNode* itt = adjacencyListHead, *temp;
 		while (itt) {
-			if (allVertices[vtxIndex] == itt->from) {
-				if (!visited[vtxIndex]) {
-					child++;
-					parent[findIndex(itt->to, allVertices, noOfVertices)] = vtxIndex;
-					findAP();
-				}
-			}
-			if (allVertices[vtxIndex] == itt->to) {
-
-			}
-		}
-	}
-
-	bool isBridge(adjacencyListNode*& edgesList, const int& noOFVertices, const int& fromID, const int& toID, const int* verticeIDs) {
-		
-		return true;
-	}
-
-	bool bridgeCheck(adjacencyListNode* check) {
-		int n = 0;
-		Queue q;
-		BFSList visited;
-		vertex* vtx = list->address;
-		listNode* itt = list;
-		visited.create(list);
-		visited.markVisited(vtx->getID());
-		while (vtx->getOutNode() == 0) {
-			vtx = itt->address;
+			temp = itt;
 			itt = itt->next;
-		}
-		q.enqueue(vtx);
-		while (!q.isEmpty()) {
-			vtx = q.dequeue();
-			itt = vtx->getOutNode();
-			while (itt != 0) {
-				if (visited.checkStatus(itt->address->getID()) == 0) {
-					if (vtx->getID() == check->from && itt->address->getID() == check->to) {
-						itt = itt->next;
-						continue;
-					}
-					else if (vtx->getID() == check->to && itt->address->getID() == check->from) {
-						itt = itt->next;
-						continue;
-					}
-					else {
-						q.enqueue(itt->address);
-						visited.markVisited(itt->address->getID());
+			if (allVertices[u] == temp->from) {  // selecting only ones with particular vertex present.
+				v = findI(temp->to, allVertices, noOfVertices);
+				if (!visited[v]) {
+					parent[v] = u;
+					findBridge(v, noOfVertices, visited, discoveryTime, lowestTime, allVertices, parent, time, result);
+
+					lowestTime[v] = min(lowestTime[v], lowestTime[u]);
+
+					if (lowestTime[v] > discoveryTime[u]) {
+						result++;
 					}
 				}
-				itt = itt->next;
+				else if (v != parent[u]) {
+					lowestTime[u] = min(lowestTime[u], discoveryTime[v]);
+				}
 			}
-			visited.markComplete(vtx->getID());
-			n++;
 		}
-		cout << n << endl;
-		if (visited.checkAllStatus()) {
-			return false;
-		}
-		return true;
+
 	}
+	int BridgeDFS(int vertNo, vertex** vertices, int noOfVertices, bool* visited, int* lowestTime, int* discoveryTime, int parentVertex = -1) {
+		int noOfBridges = 0;  
+		vertex* vert = vertices[vertNo];
+		vertex* vertexOutNodes;
+		int n = vert->noOfOutNodes();
+		int to = 0;
+		listNode* itt = 0;
+		itt = vert->getInNode();
+		int i = 0;
+		while(itt){
+			vertexOutNodes = itt->address;
+			to = findIndex(itt->address, vertices, noOfVertices);  // finding index corresponding to the to node of outNode.
+			
+		if (to != parentVertex) {
+				if (visited[to]) {
+					lowestTime[to] = min(lowestTime[vertNo], discoveryTime[to]);
+				}
+				else {
+					noOfBridges += BridgeDFS(to, vertices, noOfVertices, visited, lowestTime, discoveryTime, vertNo);
+					lowestTime[vertNo] = min(lowestTime[vertNo], lowestTime[to]);
+					if (lowestTime[to] > discoveryTime[vertNo]) {
+						noOfBridges++;
+					}
+				}
+			}
+			itt = itt->next;
+			i++;
+		}
+		return noOfBridges;
+	}
+
 
 
 public:
@@ -590,7 +560,7 @@ public:
 		getline(file, buffer);
 		getline(file, buffer);
 		getline(file, buffer);
-		while (counter < 5000) {  // initially 10 to test on small dataset.
+		while (true) {  // initially 10 to test on small dataset.
 			getline(file, buffer);  // reading line.
 			if (buffer == "") {
 				break;
@@ -641,6 +611,15 @@ public:
 			}
 			itt = itt->next;
 		}
+	}
+	int countNodes() {
+		int no = 0;
+		listNode* itt = list;
+		while (itt != 0) {
+			no++;
+			itt = itt->next;
+		}
+		return no;
 	}
 
 	// Parts 1, 2, 3, 4, 5, 6
@@ -696,18 +675,10 @@ public:
 		cout << "Number of isolated nodes: " << n << endl;
 	}
 	void noOfArticulationNodes() {
-		cout << "Number of articulation nodes: " << countArticulation() << endl;
+		cout << "Number of Articulation Nodes: " << ArticulationPrerequisites(true) << endl;
 	}
 	void noOfBridgeEdges() {
-		adjacencyListNode* itt = adjacencyListHead;
-		int n = 0;
-		while (itt != 0) {
-			if (bridgeCheck(itt)) {
-				n++;
-			}
-			itt = itt->next;
-		}
-		cout << "Number of Bridge Edges: " << n << endl;
+		cout << "Number of Bridge Edges: " << ArticulationPrerequisites(false) << endl;
 	}
 
 	// Parts 8 and 9
