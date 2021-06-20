@@ -205,29 +205,29 @@ struct componentListNode
 {
 	// Data members 
 	vertex* ver; // Points to the current vertex
-	listNode* bi; // Stores nodes that have a bidirectional edge with the current node
-	int size; // Stores number of bidirectional edges that the current node has
+	listNode* comp; 
+	int size; 
 
 	componentListNode* next;
 
 	componentListNode()
 	{
 		ver = 0;
-		bi = 0;
+		comp = 0;
 		size = 1;
 		next = 0;
 	}
 
-	void addBi(vertex* add)
+	void add(vertex* add)
 	{
 		listNode* temp = new listNode;
 		temp->address = add;
-		if (bi == 0)
-			bi = temp;
+		if (comp == 0)
+			comp = temp;
 		else
 		{
-			temp->next = bi;
-			bi = temp;
+			temp->next = comp;
+			comp = temp;
 		}
 		size++;
 	}
@@ -584,7 +584,7 @@ class graph {
 			while (in != 0)
 			{
 				if (out->address->getID() == in->address->getID())
-					currVer->addBi(out->address); // Add the current out vertex because it has a bidirectional relationship with the current vertex
+					currVer->add(out->address); // Add the current out vertex because it has a bidirectional relationship with the current vertex
 				in = in->next;
 			}
 			out = out->next;
@@ -600,14 +600,14 @@ class graph {
 
 		while (out != 0)
 		{
-			curr->addBi(out->address);
+			curr->add(out->address);
 			out = out->next;
 		}
 
 		listNode* in = v->getInNode();
 		while (in != 0)
 		{
-			listNode* temp = curr->bi;
+			listNode* temp = curr->comp;
 			bool flag = false;
 			while (temp != 0)
 			{
@@ -619,7 +619,7 @@ class graph {
 				temp = temp->next;
 			}
 			if (!flag)
-				curr->addBi(in->address);
+				curr->add(in->address);
 			in = in->next;
 		}
 		return curr;
@@ -908,7 +908,7 @@ public:
 		cout << "The size of the largest strongly connected component is " << max << "." << endl;
 		cout << maxComponent->ver->getID();
 
-		listNode* temp = maxComponent->bi;
+		listNode* temp = maxComponent->comp;
 		while (temp != 0)
 		{
 			cout << " - " << temp->address->getID();
@@ -941,7 +941,7 @@ public:
 		{
 			cout << "Size: " << currComp->size << endl;
 			cout << currComp->ver->getID();
-			listNode * temp = currComp->bi;
+			listNode * temp = currComp->comp;
 			while (temp != 0)
 			{
 				cout << " - " << temp->address->getID();
@@ -988,7 +988,7 @@ public:
 		cout << "The size of the largest weakly connected component is " << max << "." << endl;
 		cout << maxComponent->ver->getID();
 
-		listNode* temp = maxComponent->bi;
+		listNode* temp = maxComponent->comp;
 		while (temp != 0)
 		{
 			cout << " - " << temp->address->getID();
@@ -1019,7 +1019,7 @@ public:
 		{
 			cout << "Size: " << currComponent->size << endl;
 			cout << currComponent->ver->getID();
-			listNode* temp = currComponent->bi;
+			listNode* temp = currComponent->comp;
 			while (temp != 0)
 			{
 				cout << " - " << temp->address->getID();
