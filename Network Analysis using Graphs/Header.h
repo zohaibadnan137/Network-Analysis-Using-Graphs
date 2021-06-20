@@ -323,6 +323,7 @@ public:
 	}
 };
 
+// Helper functions
 int findIndex(vertex* find, vertex** Arr, int size) {
 	for (int i = 0; i < size; i++) {
 		if (Arr[i] == find) {
@@ -339,7 +340,6 @@ int findI(int f, int* arr, int size) {
 	}
 	return -1;
 }
-
 int min(int n1, int n2) {
 	if (n1 < n2) {
 		return n1;
@@ -624,7 +624,6 @@ class graph {
 		}
 		return curr;
 	}
-
 
 public:
 	// prerequisites
