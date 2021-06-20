@@ -1,6 +1,9 @@
-#include"Header.h"
+#include "Header.h"
 
-int main() {
+#include<SFML/Graphics.hpp>
+#include "Menu.h"
+
+/*int main() {
 	string dataPath = "./Text.txt";
 	graph G1;
 	G1.createGraph(dataPath);
@@ -22,8 +25,8 @@ int main() {
 	G1.findShortestPath(25543, 26048);
 
 	// Part 2
-	/*G1.displayInDegree();
-	G1.displayOutDegree();*/
+	//G1.displayInDegree();
+	//G1.displayOutDegree();
 
 	// Part 3
 	G1.findLargestSCC();
@@ -31,4 +34,31 @@ int main() {
 	cout << endl;
 
 	G1.findLargestWCC();
+}*/
+
+int main()
+{
+	sf::RenderWindow window(sf::VideoMode(960, 720), "Network Analysis Using Graphs");
+
+	CoolMenu menu(window.getSize().x, window.getSize().y);
+
+	while (window.isOpen())
+	{
+		sf::Event event;
+
+		while (window.pollEvent(event));
+		{
+			switch (event.type)
+			{
+			case sf::Event::Closed:
+				window.close();
+				break;
+			}
+		}
+
+		window.clear();
+		menu.draw(window);
+		window.display();
+	}
+	return 0;
 }
